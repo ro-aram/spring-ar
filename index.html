@@ -1,28 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Explore the Agios Athanasios Fountain as an augmented reality model.">
-  <title>Agios Athanasios Fountain — AR model</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agios Athanasios Fountain — AR model</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.8/aframe/build/aframe-ar.js"></script>
+<style>body{overflow:hidden}.camera-links{position:fixed;bottom:max(20px,env(safe-area-inset-bottom));left:16px;z-index:10;display:flex;gap:8px}.camera-links a{background:white;color:#151515;padding:10px 14px;border:1px solid #777;text-decoration:none;font-size:14px}</style>
 </head>
 <body>
-  <div class="page">
-    <header class="masthead"><a href="./" class="identity">Agios Athanasios<br>Fountain</a><span>Spatial documentation</span></header>
-    <main class="layout">
-      <section class="drawing" aria-label="Architectural section drawing">
-        <figure><img src="section-reference.png" alt="Architectural section through Agios Athanasios Fountain"></figure>
-        <div class="caption"><span>Agios Athanasios Fountain</span><span>Section drawing</span></div>
-      </section>
-      <aside class="information">
-        <h1>Agios<br>Athanasios<br>Fountain</h1>
-        <div class="rule-block introduction"><p>A spatial model of the spring, anchored to the printed page.</p><a class="primary" href="ar.html">Open camera <span aria-hidden="true">↗</span></a></div>
-        <section class="rule-block"><h2>View the model</h2><ol><li>Print the marker sheet at actual size.</li><li>Open the camera and allow access.</li><li>Point your phone at the entire Hiro marker.</li></ol><a class="text-link" href="hoja.html">Print the marker sheet <span aria-hidden="true">↗</span></a></section>
-        <section class="rule-block"><h2>Scale</h2><p>1:500, calibrated from the site drawing. The black marker border should measure 8 × 8 cm. Print at 100% and check with a ruler.</p></section>
-        <section class="rule-block"><h2>Note</h2><p>Keep the marker visible and well lit. The model may take a moment to load; tracking and scale are approximate.</p></section>
-        <footer class="rule-block footer"><span>Foundation Studio I</span><span>ETH MScLA</span></footer>
-      </aside>
-    </main>
-  </div>
-</body></html>
+<div id="hint" class="camera-hint" role="status" aria-live="polite">Allow camera access and point at the Hiro marker. Loading the model…</div>
+<nav class="camera-links" aria-label="Information"><a href="about.html">About</a><a href="hoja.html">Print marker</a></nav>
+<a-scene embedded vr-mode-ui="enabled: false" renderer="colorManagement: true; antialias: true" arjs="sourceType: webcam; debugUIEnabled: false;">
+<a-assets timeout="60000"><a-asset-item id="spring" src="spring-marker.glb"></a-asset-item></a-assets>
+<a-marker preset="hiro" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2"><a-entity id="model" gltf-model="#spring"></a-entity></a-marker>
+<a-entity camera></a-entity>
+</a-scene>
+<script>
+const hint = document.getElementById('hint');
+const model = document.getElementById('model');
+const marker = document.querySelector('a-marker');
+model.addEventListener('model-loaded', () => { hint.textContent = 'Point at the entire Hiro marker to see the model.'; });
+model.addEventListener('model-error', () => { hint.textContent = 'The model could not be loaded. Check your connection and try again.'; });
+marker.addEventListener('markerFound', () => { hint.textContent = 'Marker found. Keep it in view.'; });
+marker.addEventListener('markerLost', () => { hint.textContent = 'Point at the entire Hiro marker again.'; });
+// AR.js assumes a 4:3 frame in portrait; match the actual camera frame instead.
+const scene = document.querySelector('a-scene');
+function correctCameraSizing() {
+  const source = scene.systems.arjs?._arSession?.arSource;
+  if (!source || !source.domElement) return false;
+  source.copyElementSizeTo = function (target) {
+    if (target === document.body) return;
+    for (const property of ['width', 'height', 'marginLeft', 'marginTop']) {
+      target.style[property] = this.domElement.style[property];
+    }
+  };
+  const resize = source.onResize;
+  source.onResize = function (...args) {
+    resize.apply(this, args);
+    if (scene.canvas) this.copyElementSizeTo(scene.canvas);
+  };
+  return true;
+}
+function startSizingFix() {
+  if (correctCameraSizing()) return;
+  const timer = setInterval(() => { if (correctCameraSizing()) clearInterval(timer); }, 250);
+  setTimeout(() => clearInterval(timer), 30000);
+}
+if (scene.hasLoaded) startSizingFix(); else scene.addEventListener('loaded', startSizingFix);
+</script>
+</body>
+</html>
+
+
