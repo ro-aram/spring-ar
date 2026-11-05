@@ -12,7 +12,7 @@
 <body>
 <div id="hint" class="camera-hint" role="status" aria-live="polite">Allow camera access and point at the Hiro marker. Loading the model…</div>
 <nav class="camera-links" aria-label="Information"><a href="about.html">About</a><a href="hoja.html">Print marker</a></nav>
-<a-scene embedded vr-mode-ui="enabled: false" renderer="colorManagement: true; antialias: true" arjs="sourceType: webcam; debugUIEnabled: false;">
+<a-scene embedded vr-mode-ui="enabled: false" renderer="colorManagement: true; antialias: true" arjs="sourceType: webcam; sourceWidth: 1280; sourceHeight: 960; debugUIEnabled: false;">
 <a-assets timeout="60000"><a-asset-item id="spring" src="spring-marker.glb"></a-asset-item></a-assets>
 <a-marker preset="hiro" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2"><a-entity id="model" gltf-model="#spring"></a-entity></a-marker>
 <a-entity camera></a-entity>
@@ -52,6 +52,7 @@ if (scene.hasLoaded) startSizingFix(); else scene.addEventListener('loaded', sta
 </script>
 </body>
 </html>
+
 
 
 
