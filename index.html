@@ -13,7 +13,7 @@
 <div id="hint" class="camera-hint" role="status" aria-live="polite">Allow camera access and point at the Hiro marker. Loading the model…</div>
 <nav class="camera-links" aria-label="Information"><a href="about.html">About</a><a href="hoja.html">Print marker</a></nav>
 <a-scene embedded vr-mode-ui="enabled: false" renderer="colorManagement: true; antialias: true" arjs="sourceType: webcam; sourceWidth: 1280; sourceHeight: 960; debugUIEnabled: false;">
-<a-assets timeout="60000"><a-asset-item id="spring" src="spring-marker.glb"></a-asset-item></a-assets>
+<a-assets timeout="60000"><a-asset-item id="spring" src="spring-light.glb"></a-asset-item></a-assets>
 <a-marker preset="hiro" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2"><a-entity id="model" gltf-model="#spring"></a-entity></a-marker>
 <a-entity camera></a-entity>
 </a-scene>
@@ -21,10 +21,22 @@
 const hint = document.getElementById('hint');
 const model = document.getElementById('model');
 const marker = document.querySelector('a-marker');
-model.addEventListener('model-loaded', () => { hint.textContent = 'Point at the entire Hiro marker to see the model.'; });
-model.addEventListener('model-error', () => { hint.textContent = 'The model could not be loaded. Check your connection and try again.'; });
-marker.addEventListener('markerFound', () => { hint.textContent = 'Marker found. Keep it in view.'; });
-marker.addEventListener('markerLost', () => { hint.textContent = 'Point at the entire Hiro marker again.'; });
+let modelState = 'loading';
+let markerVisible = false;
+function updateStatus() {
+  if (modelState === 'error') {
+    hint.textContent = 'The model could not be loaded. Check your connection and reload the page.';
+  } else if (modelState === 'loading') {
+    hint.textContent = markerVisible ? 'Marker found. Loading the 3D model…' : 'Loading the 3D model… Allow camera access and point at the Hiro marker.';
+  } else {
+    hint.textContent = markerVisible ? 'Model loaded. Keep the marker in view.' : 'Model loaded. Point at the entire Hiro marker.';
+  }
+}
+model.addEventListener('model-loaded', () => { modelState = 'loaded'; updateStatus(); });
+model.addEventListener('model-error', () => { modelState = 'error'; updateStatus(); });
+document.getElementById('spring').addEventListener('error', () => { modelState = 'error'; updateStatus(); });
+marker.addEventListener('markerFound', () => { markerVisible = true; updateStatus(); });
+marker.addEventListener('markerLost', () => { markerVisible = false; updateStatus(); });
 // AR.js assumes a 4:3 frame in portrait; match the actual camera frame instead.
 const scene = document.querySelector('a-scene');
 function correctCameraSizing() {
@@ -52,6 +64,8 @@ if (scene.hasLoaded) startSizingFix(); else scene.addEventListener('loaded', sta
 </script>
 </body>
 </html>
+
+
 
 
 
