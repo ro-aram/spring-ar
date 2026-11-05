@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="style.css">
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.8/aframe/build/aframe-ar.js"></script>
-<style>body{overflow:hidden}.camera-links{position:fixed;bottom:max(20px,env(safe-area-inset-bottom));left:16px;z-index:10;display:flex;gap:8px}.camera-links a{background:white;color:#151515;padding:10px 14px;border:1px solid #777;text-decoration:none;font-size:14px}</style>
+<style>body{overflow:hidden}#arjs-video{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;margin:0!important;object-fit:cover!important;object-position:center!important}.camera-links{position:fixed;bottom:max(20px,env(safe-area-inset-bottom));left:16px;z-index:10;display:flex;gap:8px}.camera-links a{background:white;color:#151515;padding:10px 14px;border:1px solid #777;text-decoration:none;font-size:14px}</style>
 </head>
 <body>
 <div id="hint" class="camera-hint" role="status" aria-live="polite">Allow camera access and point at the Hiro marker. Loading the model…</div>
@@ -52,5 +52,6 @@ if (scene.hasLoaded) startSizingFix(); else scene.addEventListener('loaded', sta
 </script>
 </body>
 </html>
+
 
 
